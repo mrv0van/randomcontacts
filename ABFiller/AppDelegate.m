@@ -61,7 +61,8 @@
 			}
 			default:
 			{
-				printf(" i don't know!\n");
+				printf(" no access!\n");
+				exit(1);
 				break;
 			}
 		}
@@ -109,6 +110,7 @@
 	}];
 	ABAddressBookSave(addressBook, NULL);
 	printf(" done!");
+	exit(0);
 }
 
 @end
