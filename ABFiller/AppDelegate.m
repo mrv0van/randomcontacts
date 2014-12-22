@@ -77,7 +77,10 @@
 	static const NSString *ABLastName  = @"last";
 	static const NSString *ABEmail     = @"email";
 	static const NSString *ABPhone     = @"phone";
-	NSArray *contacts = @[
+	NSArray *contacts = nil;
+ 
+#if 0
+	contacts = @[
 		@{ ABFirstName:@"Деймон",   ABLastName:@"Ватсон",       ABEmail:@"damon@test.com",       ABPhone:@"+7 (900) 100-00-00" },
 		@{ ABFirstName:@"Неил",     ABLastName:@"Тунниклиф",    ABEmail:@"neil@test.com",        ABPhone:@"+7 (900) 200-00-00" },
 		@{ ABFirstName:@"Томас",    ABLastName:@"Ремвик Аасен", ABEmail:@"tra@test.com",         ABPhone:@"+7 (900) 300-00-00" },
@@ -91,6 +94,73 @@
 		@{ ABFirstName:@"Антон",    ABLastName:@"Серебряков",   ABEmail:@"serebryakov@test.com", ABPhone:@"+7 (916) 378-46-87" },
 		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov@test.com",       ABPhone:@"+7 (967) 241-83-66" },
 	];
+#else
+	contacts = [NSMutableArray array];
+
+	const NSInteger FirstsCount = 20;
+	NSArray *Firsts = @[
+		@"Зандерлог",
+		@"Кирсан",
+		@"Алтудег",
+		@"Бордех",
+		@"Щдуырук",
+		@"Айфозавр",
+		@"Крабхаз",
+		@"Ктулху",
+		@"Парофен",
+		@"Ульрих",
+		@"Ибупрофен",
+		@"Митрандокл",
+		@"Цуцхейчуг",
+		@"Ыкуцфыг",
+		@"Хъэдякцыф",
+		@"Леголас",
+		@"Бармалей",
+		@"Чупакабра",
+		@"Джон",
+		@"Фридрих",
+	];
+	
+	const NSInteger LastsCount = 20;
+	NSArray *Lasts = @[
+		@"Забугорденко",
+		@"Обама",
+		@"Иванов",
+		@"Петров",
+		@"Сидоров",
+		@"Глупый",
+		@"Катапультов",
+		@"Ряженка",
+		@"Поттер",
+		@"Грозный",
+		@"Милый",
+		@"Грустный",
+		@"Веселый",
+		@"Прикольный",
+		@"Квазимода",
+		@"Богатый",
+		@"Бедный",
+		@"Костров",
+		@"Цыган",
+		@"Царь",
+	];
+	
+	for (NSInteger i = 0; i < 500; i += 1)
+	{
+		NSMutableDictionary *contact = [NSMutableDictionary new];
+		contact[ABFirstName] = Firsts[rand() % FirstsCount];
+		contact[ABLastName] = Lasts[rand() % LastsCount];
+
+		NSMutableString *phoneString = [NSMutableString stringWithString:@"7"];
+		for (NSInteger j = 0; j < 10; j += 1)
+			[phoneString appendFormat:@"%i", (rand() % 10)];
+		contact[ABPhone] = [[phoneString copy] autorelease];
+		
+		contact[ABEmail] = [@[contact[ABFirstName], @"@", contact[ABLastName], @".ru" ] componentsJoinedByString:@""].lowercaseString;
+		
+		[(NSMutableArray *)contacts addObject:[contact autorelease]];
+	}
+#endif
 	
 	[contacts enumerateObjectsUsingBlock:^(NSDictionary *contact, NSUInteger idx, BOOL *stop) {
 		ABRecordRef record = ABPersonCreate();
