@@ -71,33 +71,21 @@
 
 - (void)fillAddressBook
 {
+	printf("Cleaning address book...");
+	CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook);
+
+	CFIndex peopleCount = CFArrayGetCount(allPeople);
+	for (CFIndex i = 0; i < peopleCount; i += 1)
+	{
+		ABRecordRef person = CFArrayGetValueAtIndex(allPeople, i);
+		ABAddressBookRemoveRecord(addressBook, person, nil);
+	}
+	CFRelease(allPeople);
+	printf(" done!\n");
+	
 	printf("Filling address book...");
 	
-	static const NSString *ABFirstName = @"first";
-	static const NSString *ABLastName  = @"last";
-	static const NSString *ABEmail     = @"email";
-	static const NSString *ABPhone     = @"phone";
-	NSArray *contacts = nil;
- 
-#if 0
-	contacts = @[
-		@{ ABFirstName:@"Деймон",   ABLastName:@"Ватсон",       ABEmail:@"damon@test.com",       ABPhone:@"+7 (900) 100-00-00" },
-		@{ ABFirstName:@"Неил",     ABLastName:@"Тунниклиф",    ABEmail:@"neil@test.com",        ABPhone:@"+7 (900) 200-00-00" },
-		@{ ABFirstName:@"Томас",    ABLastName:@"Ремвик Аасен", ABEmail:@"tra@test.com",         ABPhone:@"+7 (900) 300-00-00" },
-		@{ ABFirstName:@"Винсент",  ABLastName:@"Херманс",      ABEmail:@"hermance@test.com",    ABPhone:@"+7 (900) 400-00-00" },
-		@{ ABFirstName:@"Жиль",     ABLastName:@"Костильо",     ABEmail:@"cousteller@test.com",  ABPhone:@"+7 (900) 500-00-00" },
-		@{ ABFirstName:@"Бенито",   ABLastName:@"Рос",          ABEmail:@"bros@test.com",        ABPhone:@"+7 (900) 600-00-00" },
-		@{ ABFirstName:@"Кенни",    ABLastName:@"Белей",        ABEmail:@"belaey@test.com",      ABPhone:@"+7 (900) 700-00-00" },
-		@{ ABFirstName:@"Орильен",  ABLastName:@"Фонтеной",     ABEmail:@"fontenua@test.com",    ABPhone:@"+7 (900) 800-00-00" },
-		@{ ABFirstName:@"Абель",    ABLastName:@"Мустиестес",   ABEmail:@"abel@test.com",        ABPhone:@"+7 (900) 900-00-00" },
-		@{ ABFirstName:@"Владимир", ABLastName:@"Озеров",       ABEmail:@"ozermanious@test.com", ABPhone:@"+7 (916) 345-88-94" },
-		@{ ABFirstName:@"Антон",    ABLastName:@"Серебряков",   ABEmail:@"serebryakov@test.com", ABPhone:@"+7 (916) 378-46-87" },
-		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov@test.com",       ABPhone:@"+7 (967) 241-83-66" },
-	];
-#else
-	contacts = [NSMutableArray array];
-
-	const NSInteger FirstsCount = 20;
+	const NSInteger FirstsCount = 41;
 	NSArray *Firsts = @[
 		@"Зандерлог",
 		@"Кирсан",
@@ -119,9 +107,31 @@
 		@"Чупакабра",
 		@"Джон",
 		@"Фридрих",
+		
+		@"Али",
+		@"Корвин",
+		@"Бабай",
+		@"Йозеф",
+		@"Гэндальф",
+		@"Фродо",
+		@"Сэммиум",
+		@"Перигрин",
+		@"Мерри",
+		@"Арагорн",
+		@"Боромир",
+		@"Фарамир",
+		@"Галадриэль",
+		@"Теоден",
+		@"Саруман",
+		@"Саурон",
+		@"Горлум",
+		@"Смеагорл",
+		@"Протос",
+		@"Люк",
+		@"Митрандир",
 	];
 	
-	const NSInteger LastsCount = 20;
+	const NSInteger LastsCount = 41;
 	NSArray *Lasts = @[
 		@"Забугорденко",
 		@"Обама",
@@ -143,24 +153,72 @@
 		@"Костров",
 		@"Цыган",
 		@"Царь",
+		@"Эмберский",
+		@"Серый",
+		@"Скайуокер",
+		@"Вейдер",
+		@"Тесла",
+		@"Цукерберг",
+		@"Бегущий",
+		@"Трусливый",
+		@"Отважный",
+		@"Безнадежный",
+		@"Джобс",
+		@"Тьюринг",
+		@"Победитель",
+		@"Пошел-есть",
+		@"Больной",
+		@"Забери-меня-домой",
+		@"Быдлокодер",
+		@"Скучный",
+		@"Зануда",
+		@"Двуличный",
+		@"Криптонит",
 	];
 	
-	for (NSInteger i = 0; i < 500; i += 1)
+	static const NSString *ABFirstName = @"first";
+	static const NSString *ABLastName  = @"last";
+	static const NSString *ABEmail     = @"email";
+	static const NSString *ABPhone1     = @"phone1";
+	static const NSString *ABPhone2    = @"phone2";
+	static const NSString *ABImage     = @"image";
+	NSMutableArray *contacts = [NSMutableArray array];
+	
+	for (NSInteger i = 0; i < 50; i += 1)
 	{
 		NSMutableDictionary *contact = [NSMutableDictionary new];
 		contact[ABFirstName] = Firsts[rand() % FirstsCount];
 		contact[ABLastName] = Lasts[rand() % LastsCount];
 
-		NSMutableString *phoneString = [NSMutableString stringWithString:@"7"];
-		for (NSInteger j = 0; j < 10; j += 1)
-			[phoneString appendFormat:@"%i", (rand() % 10)];
-		contact[ABPhone] = [[phoneString copy] autorelease];
+		contact[ABPhone1] = ({
+			NSMutableString *phoneString = [NSMutableString stringWithString:@"79"];
+			for (NSInteger j = 0; j < 9; j += 1)
+				[phoneString appendFormat:@"%i", (rand() % 10)];
+			[[phoneString copy] autorelease];
+		});
+		if (i % 2 != 0)
+			contact[ABPhone2] = ({
+				NSMutableString *phoneString = [NSMutableString stringWithString:@"79"];
+				for (NSInteger j = 0; j < 9; j += 1)
+					[phoneString appendFormat:@"%i", (rand() % 10)];
+				[[phoneString copy] autorelease];
+			});
 		
 		contact[ABEmail] = [@[contact[ABFirstName], @"@", contact[ABLastName], @".ru" ] componentsJoinedByString:@""].lowercaseString;
+
+		contact[ABImage] = [NSString stringWithFormat:@"%li.jpg", (i % 21)];
 		
 		[(NSMutableArray *)contacts addObject:[contact autorelease]];
 	}
-#endif
+
+	[contacts addObjectsFromArray:@[
+		@{ ABFirstName:@"Владимир", ABLastName:@"Озеров",       ABEmail:@"ozermanious@test.com",  ABPhone1:@"+7 (916) 345-88-94", ABPhone2:@"+7 (917) 844-07-30", ABImage:@"Kianu"    },
+		@{ ABFirstName:@"Антон",    ABLastName:@"Серебряков",   ABEmail:@"serebryakov@test.com",  ABPhone1:@"+7 (916) 378-46-87", ABPhone2:@"+7 (904) 753-93-83", ABImage:@"Crazyman.jpg" },
+		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov.maxim@test.com",  ABPhone1:@"+7 (967) 241-83-66",                                 ABImage:@"Boss.jpg" },
+		@{ ABFirstName:@"Сергей",   ABLastName:@"Марчуков",     ABEmail:@"marchukov@test.com",    ABPhone1:@"+7 (999) 814-72-09", ABPhone2:@"+7 (927) 500-89-63", ABImage:@"Developer.jpg" },
+		@{ ABFirstName:@"Алексей",  ABLastName:@"Леванов",      ABEmail:@"levanov@test.com",      ABPhone1:@"+7 (915) 077-97-49",                                 ABImage:@"Flash.jpg" },
+		@{ ABFirstName:@"Дмитрий",  ABLastName:@"Сакал",        ABEmail:@"sakalthebest@test.com", ABPhone1:@"+7 (903) 230-94-61",                                 ABImage:@"Snowboard.jpg" },
+	]];
 	
 	[contacts enumerateObjectsUsingBlock:^(NSDictionary *contact, NSUInteger idx, BOOL *stop) {
 		ABRecordRef record = ABPersonCreate();
@@ -173,9 +231,20 @@
 		ABRecordSetValue(record, kABPersonEmailProperty, email, NULL);
 		
 		ABMutableMultiValueRef phone = ABMultiValueCreateMutable(kABStringPropertyType);
-		ABMultiValueAddValueAndLabel(phone, contact[ABPhone], kABHomeLabel, NULL);
+		ABMultiValueAddValueAndLabel(phone, contact[ABPhone1], kABHomeLabel, NULL);
+		if (contact[ABPhone2])
+			ABMultiValueAddValueAndLabel(phone, contact[ABPhone2], kABWorkLabel, NULL);
 		ABRecordSetValue(record, kABPersonPhoneProperty, phone, NULL);
 		
+		// Image
+		if (contact[ABImage])
+		{
+			UIImage *img = [UIImage imageNamed:contact[ABImage]];
+			NSData *dataRef = UIImagePNGRepresentation(img);
+			CFDataRef cfDataRef = CFDataCreate(NULL, [dataRef bytes], [dataRef length]);
+			ABPersonSetImageData(record, cfDataRef, nil);
+		}
+
 		ABAddressBookAddRecord(addressBook, record, NULL);
 	}];
 	ABAddressBookSave(addressBook, NULL);
