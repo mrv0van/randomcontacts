@@ -212,6 +212,7 @@
 	}
 
 	[contacts addObjectsFromArray:@[
+		@{ ABPhone1:@"+7 (999) 111-22-33" },
 		@{ ABFirstName:@"Владимир", ABLastName:@"Озеров",       ABEmail:@"ozermanious@test.com",  ABPhone1:@"+7 (916) 345-88-94", ABPhone2:@"+7 (917) 844-07-30", ABImage:@"Kianu"    },
 		@{ ABFirstName:@"Антон",    ABLastName:@"Серебряков",   ABEmail:@"serebryakov@test.com",  ABPhone1:@"+7 (916) 378-46-87", ABPhone2:@"+7 (904) 753-93-83", ABImage:@"Crazyman.jpg" },
 		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov.maxim@test.com",  ABPhone1:@"+7 (967) 241-83-66",                                 ABImage:@"Boss.jpg" },
