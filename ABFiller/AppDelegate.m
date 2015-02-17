@@ -83,98 +83,50 @@
 	CFRelease(allPeople);
 	printf(" done!\n");
 	
+#if 0
+	printf("Randomization contacts enabled!\n");
+	srand((unsigned int)time(0));
+#endif
+	
 	printf("Filling address book...");
 	
-	const NSInteger FirstsCount = 41;
+	static const NSInteger FirstsCount = 70;
 	NSArray *Firsts = @[
-		@"Зандерлог",
-		@"Кирсан",
-		@"Алтудег",
-		@"Бордех",
-		@"Щдуырук",
-		@"Айфозавр",
-		@"Крабхаз",
-		@"Ктулху",
-		@"Парофен",
-		@"Ульрих",
-		@"Ибупрофен",
-		@"Митрандокл",
-		@"Цуцхейчуг",
-		@"Ыкуцфыг",
-		@"Хъэдякцыф",
-		@"Леголас",
-		@"Бармалей",
-		@"Чупакабра",
-		@"Джон",
-		@"Фридрих",
-		
-		@"Али",
-		@"Корвин",
-		@"Бабай",
-		@"Йозеф",
-		@"Гэндальф",
-		@"Фродо",
-		@"Сэммиум",
-		@"Перигрин",
-		@"Мерри",
-		@"Арагорн",
-		@"Боромир",
-		@"Фарамир",
-		@"Галадриэль",
-		@"Теоден",
-		@"Саруман",
-		@"Саурон",
-		@"Горлум",
-		@"Смеагорл",
-		@"Протос",
-		@"Люк",
-		@"Митрандир",
+		@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
+		@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2
+		@"Ибупрофен",	@"Митрандокл",	@"Цуцхейчуг",	@"Ыкуцфыг",		@"Хъэдякцыф",	// 3
+		@"Леголас",		@"Бармалей",	@"Чупакабра",	@"Джон",		@"Фридрих",		// 4
+		@"Али",			@"Корвин",		@"Бабай",		@"Йозеф",		@"Гэндальф",	// 5
+		@"Фродо",		@"Сэммиум",		@"Перигрин",	@"Мерри",		@"Арагорн",		// 6
+		@"Боромир",		@"Фарамир",		@"Леголас",		@"Теоден",		@"Саруман",		// 7
+		@"Саурон",		@"Горлум",		@"Смеагорл",	@"Протос",		@"Люк",			// 8
+		@"Митрандир",	@"Колобок",		@"Гена",		@"Гимли",		@"Дарин",		// 9
+		@"Балин",		@"Двалин",		@"Бильбо",		@"Мерлин",		@"Максимильян",	// 10
+		@"Николай",		@"Батут",		@"Оби-Ван",		@"Йода",		@"Квай-Гон",	// 11
+		@"Энакин",		@"Хан",			@"Чубакка",		@"Мейс",		@"Боба",		// 12
+		@"Джабба",		@"Элон",		@"Брюс",		@"Арнольд",		@"Капитан",		// 13
+		@"Генерал",		@"Спанчбоб",	@"Мистер",		@"Кларк",		@"Самый",		// 14
 	];
+	BOOL firstsChosen[FirstsCount] = { 0 };
 	
-	const NSInteger LastsCount = 41;
+	static const NSInteger LastsCount = 70;
 	NSArray *Lasts = @[
-		@"Забугорденко",
-		@"Обама",
-		@"Иванов",
-		@"Петров",
-		@"Сидоров",
-		@"Глупый",
-		@"Катапультов",
-		@"Ряженка",
-		@"Поттер",
-		@"Грозный",
-		@"Милый",
-		@"Грустный",
-		@"Веселый",
-		@"Прикольный",
-		@"Квазимода",
-		@"Богатый",
-		@"Бедный",
-		@"Костров",
-		@"Цыган",
-		@"Царь",
-		@"Эмберский",
-		@"Серый",
-		@"Скайуокер",
-		@"Вейдер",
-		@"Тесла",
-		@"Цукерберг",
-		@"Бегущий",
-		@"Трусливый",
-		@"Отважный",
-		@"Безнадежный",
-		@"Джобс",
-		@"Тьюринг",
-		@"Победитель",
-		@"Пошел-есть",
-		@"Больной",
-		@"Забери-меня-домой",
-		@"Быдлокодер",
-		@"Скучный",
-		@"Зануда",
-		@"Двуличный",
-		@"Криптонит",
+		@"Обама",		@"Иванов",		@"Петров",		@"Сидоров",		@"Забугорденко",		// 1
+		@"Глупый",		@"Катапультов",	@"Ряженка",		@"Поттер",		@"Грозный",				// 2
+		@"Милый",		@"Грустный",	@"Веселый",		@"Прикольный",	@"Квазимода",			// 3
+		@"Богатый",		@"Бедный",		@"Костров",		@"Цыган",		@"Царь",				// 4
+		@"Эмберский",	@"Серый",		@"Скайуокер",	@"Вейдер",		@"Тесла",				// 5
+		@"Цукерберг",	@"Бегущий",		@"Трусливый",	@"Отважный",	@"Безнадежный",			// 6
+		@"Джобс",		@"Тьюринг",		@"Победитель",	@"Пошел-есть",	@"Больной",				// 7
+		@"Быдлокодер",	@"Скучный",		@"Зануда",		@"Двуличный",	@"Забери-меня-домой",	// 8
+		@"Криптонит",	@"Амидала",		@"Сидиус",		@"Органа",		@"Соло",				// 9
+		@"Фетт",		@"Хатт",		@"Подгорный",	@"Маск",		@"Безумный",			// 10
+		@"Коннор",		@"Вандам",		@"Ли",			@"Чан",			@"Шварценеггер",		// 11
+		@"Очевидность",	@"Чмо",			@"Тайсон",		@"Шайтан",		@"Бессмертный",			// 12
+		@"Крабс",		@"Кент",		@"Бонд",		@"Галустян",	@"Членс",				// 13
+		@"Слоупоук",	@"Криворукий",	@"Гаргантюа",	@"Континуум",	@"Сингулярность",		// 14
 	];
+	BOOL lastsChosen[LastsCount] = { 0 };
 	
 	static const NSString *ABFirstName = @"first";
 	static const NSString *ABLastName  = @"last";
@@ -184,22 +136,34 @@
 	static const NSString *ABImage     = @"image";
 	NSMutableArray *contacts = [NSMutableArray array];
 	
-	for (NSInteger i = 0; i < 50; i += 1)
+	for (NSInteger i = 0; i < LastsCount; i += 1)
 	{
 		NSMutableDictionary *contact = [NSMutableDictionary new];
-		contact[ABFirstName] = Firsts[rand() % FirstsCount];
-		contact[ABLastName] = Lasts[rand() % LastsCount];
+		contact[ABFirstName] = ({
+			NSInteger i = rand() % FirstsCount;
+			while (firstsChosen[i])
+				i = (i + 1) % FirstsCount;
+			firstsChosen[i] = YES;
+			Firsts[i];
+		});
+		contact[ABLastName] = ({
+			NSInteger i = rand() % LastsCount;
+			while (lastsChosen[i])
+				i = (i + 1) % LastsCount;
+			lastsChosen[i] = YES;
+			Lasts[i];
+		});
 
 		contact[ABPhone1] = ({
-			NSMutableString *phoneString = [NSMutableString stringWithString:@"79"];
-			for (NSInteger j = 0; j < 9; j += 1)
+			NSMutableString *phoneString = [NSMutableString stringWithString:@"7900"];
+			for (NSInteger j = 0; j < 7; j += 1)
 				[phoneString appendFormat:@"%i", (rand() % 10)];
 			[[phoneString copy] autorelease];
 		});
 		if (i % 2 != 0)
 			contact[ABPhone2] = ({
-				NSMutableString *phoneString = [NSMutableString stringWithString:@"79"];
-				for (NSInteger j = 0; j < 9; j += 1)
+				NSMutableString *phoneString = [NSMutableString stringWithString:@"7901"];
+				for (NSInteger j = 0; j < 7; j += 1)
 					[phoneString appendFormat:@"%i", (rand() % 10)];
 				[[phoneString copy] autorelease];
 			});
@@ -215,7 +179,7 @@
 		@{ ABPhone1:@"+7 (999) 111-22-33" },
 		@{ ABFirstName:@"Владимир", ABLastName:@"Озеров",       ABEmail:@"ozermanious@test.com",  ABPhone1:@"+7 (916) 345-88-94", ABPhone2:@"+7 (917) 844-07-30", ABImage:@"Kianu"    },
 		@{ ABFirstName:@"Антон",    ABLastName:@"Серебряков",   ABEmail:@"serebryakov@test.com",  ABPhone1:@"+7 (916) 378-46-87", ABPhone2:@"+7 (904) 753-93-83", ABImage:@"Crazyman.jpg" },
-		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov.maxim@test.com",  ABPhone1:@"+7 (967) 241-83-66",                                 ABImage:@"Boss.jpg" },
+		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov.maxim@test.com",  ABPhone1:@"+7 (967) 241-83-66", ABPhone2:@"+7 (999) 800-70-68", ABImage:@"Boss.jpg" },
 		@{ ABFirstName:@"Сергей",   ABLastName:@"Марчуков",     ABEmail:@"marchukov@test.com",    ABPhone1:@"+7 (999) 814-72-09", ABPhone2:@"+7 (927) 500-89-63", ABImage:@"Developer.jpg" },
 		@{ ABFirstName:@"Алексей",  ABLastName:@"Леванов",      ABEmail:@"levanov@test.com",      ABPhone1:@"+7 (915) 077-97-49",                                 ABImage:@"Flash.jpg" },
 		@{ ABFirstName:@"Дмитрий",  ABLastName:@"Сакал",        ABEmail:@"sakalthebest@test.com", ABPhone1:@"+7 (903) 230-94-61",                                 ABImage:@"Snowboard.jpg" },
