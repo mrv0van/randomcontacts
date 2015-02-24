@@ -88,9 +88,9 @@
 	srand((unsigned int)time(0));
 #endif
 	
-	printf("Filling address book...");
+	printf("Filling address book...\n");
 	
-	static const NSInteger FirstsCount = 70;
+	static const NSInteger RandomsCount = 75;
 	NSArray *Firsts = @[
 		@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
 		@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2
@@ -106,10 +106,10 @@
 		@"Энакин",		@"Хан",			@"Чубакка",		@"Мейс",		@"Боба",		// 12
 		@"Джабба",		@"Элон",		@"Брюс",		@"Арнольд",		@"Капитан",		// 13
 		@"Генерал",		@"Спанчбоб",	@"Мистер",		@"Кларк",		@"Самый",		// 14
+		@"Кот",         @"Омлет",       @"Котофей",     @"Шайтан",      @"Штирлиц",     // 15
 	];
-	BOOL firstsChosen[FirstsCount] = { 0 };
+	BOOL firstsChosen[RandomsCount] = { 0 };
 	
-	static const NSInteger LastsCount = 70;
 	NSArray *Lasts = @[
 		@"Обама",		@"Иванов",		@"Петров",		@"Сидоров",		@"Забугорденко",		// 1
 		@"Глупый",		@"Катапультов",	@"Ряженка",		@"Поттер",		@"Грозный",				// 2
@@ -125,8 +125,9 @@
 		@"Очевидность",	@"Чмо",			@"Тайсон",		@"Шайтан",		@"Бессмертный",			// 12
 		@"Крабс",		@"Кент",		@"Бонд",		@"Галустян",	@"Членс",				// 13
 		@"Слоупоук",	@"Криворукий",	@"Гаргантюа",	@"Континуум",	@"Сингулярность",		// 14
+		@"Экспресс",    @"Святой",      @"Первый",      @"Второй",      @"Третий",              // 15
 	];
-	BOOL lastsChosen[LastsCount] = { 0 };
+	BOOL lastsChosen[RandomsCount] = { 0 };
 	
 	static const NSString *ABFirstName = @"first";
 	static const NSString *ABLastName  = @"last";
@@ -136,20 +137,20 @@
 	static const NSString *ABImage     = @"image";
 	NSMutableArray *contacts = [NSMutableArray array];
 	
-	for (NSInteger i = 0; i < LastsCount; i += 1)
+	for (NSInteger i = 0; i < RandomsCount; i += 1)
 	{
 		NSMutableDictionary *contact = [NSMutableDictionary new];
 		contact[ABFirstName] = ({
-			NSInteger i = rand() % FirstsCount;
+			NSInteger i = rand() % RandomsCount;
 			while (firstsChosen[i])
-				i = (i + 1) % FirstsCount;
+				i = (i + 1) % RandomsCount;
 			firstsChosen[i] = YES;
 			Firsts[i];
 		});
 		contact[ABLastName] = ({
-			NSInteger i = rand() % LastsCount;
+			NSInteger i = rand() % RandomsCount;
 			while (lastsChosen[i])
-				i = (i + 1) % LastsCount;
+				i = (i + 1) % RandomsCount;
 			lastsChosen[i] = YES;
 			Lasts[i];
 		});
@@ -170,19 +171,23 @@
 		
 		contact[ABEmail] = [@[contact[ABFirstName], @"@", contact[ABLastName], @".ru" ] componentsJoinedByString:@""].lowercaseString;
 
-		contact[ABImage] = [NSString stringWithFormat:@"%li.jpg", (i % 21)];
+		contact[ABImage] = [NSString stringWithFormat:@"%li.jpg", (i % 33)];
 		
 		[(NSMutableArray *)contacts addObject:[contact autorelease]];
 	}
 
 	[contacts addObjectsFromArray:@[
 		@{ ABPhone1:@"+7 (999) 111-22-33" },
+		// Разработчики
 		@{ ABFirstName:@"Владимир", ABLastName:@"Озеров",       ABEmail:@"ozermanious@test.com",  ABPhone1:@"+7 (916) 345-88-94", ABPhone2:@"+7 (917) 844-07-30", ABImage:@"Kianu"    },
 		@{ ABFirstName:@"Антон",    ABLastName:@"Серебряков",   ABEmail:@"serebryakov@test.com",  ABPhone1:@"+7 (916) 378-46-87", ABPhone2:@"+7 (904) 753-93-83", ABImage:@"Crazyman.jpg" },
 		@{ ABFirstName:@"Максим",   ABLastName:@"Рыжов",        ABEmail:@"rijov.maxim@test.com",  ABPhone1:@"+7 (967) 241-83-66", ABPhone2:@"+7 (999) 800-70-68", ABImage:@"Boss.jpg" },
 		@{ ABFirstName:@"Сергей",   ABLastName:@"Марчуков",     ABEmail:@"marchukov@test.com",    ABPhone1:@"+7 (999) 814-72-09", ABPhone2:@"+7 (927) 500-89-63", ABImage:@"Developer.jpg" },
 		@{ ABFirstName:@"Алексей",  ABLastName:@"Леванов",      ABEmail:@"levanov@test.com",      ABPhone1:@"+7 (915) 077-97-49",                                 ABImage:@"Flash.jpg" },
 		@{ ABFirstName:@"Дмитрий",  ABLastName:@"Сакал",        ABEmail:@"sakalthebest@test.com", ABPhone1:@"+7 (903) 230-94-61",                                 ABImage:@"Snowboard.jpg" },
+		// Сверхлюди
+		@{ ABFirstName:@"Чак",      ABLastName:@"Норрис",       ABEmail:@"ch@ck.norris",          ABPhone1:@"+7 (999) 999-99-99",                                 ABImage:@"ChackNorris.jpg" },
+		@{ ABFirstName:@"Герман",   ABLastName:@"Греф",         ABEmail:@"gref@gmail.com",        ABPhone1:@"+7 (900) 000-00-00",                                 ABImage:@"Gref.jpg" },
 	]];
 	
 	[contacts enumerateObjectsUsingBlock:^(NSDictionary *contact, NSUInteger idx, BOOL *stop) {
@@ -211,9 +216,13 @@
 		}
 
 		ABAddressBookAddRecord(addressBook, record, NULL);
+		
+		// Прогресс
+		printf("%i%% done\n", (int)((float)(idx + 1) / (float)contacts.count * 100));
 	}];
+	printf("Saving address book...");
 	ABAddressBookSave(addressBook, NULL);
-	printf(" done!");
+	printf(" all done!");
 	exit(0);
 }
 
