@@ -170,8 +170,12 @@
 			});
 		
 		contact[ABEmail] = [@[contact[ABFirstName], @"@", contact[ABLastName], @".ru" ] componentsJoinedByString:@""].lowercaseString;
-
-		contact[ABImage] = [NSString stringWithFormat:@"%li.jpg", (i % 33)];
+		
+		// Например, каждый третий без аватарки
+		if (i%3 != 0)
+		{
+			contact[ABImage] = [NSString stringWithFormat:@"%li.jpg", (i % 33)];
+		}
 		
 		[(NSMutableArray *)contacts addObject:[contact autorelease]];
 	}
@@ -188,26 +192,45 @@
 		// Сверхлюди
 		@{ ABFirstName:@"Чак",      ABLastName:@"Норрис",       ABEmail:@"ch@ck.norris",          ABPhone1:@"+7 (999) 999-99-99",                                 ABImage:@"ChackNorris.jpg" },
 		@{ ABFirstName:@"Герман",   ABLastName:@"Греф",         ABEmail:@"gref@gmail.com",        ABPhone1:@"+7 (900) 000-00-00",                                 ABImage:@"Gref.jpg" },
+		// Простые
+		@{ ABFirstName:@"Президент", ABLastName:[NSNull null],       ABEmail:@"mrprezident@russia.ru", ABPhone1:@"+7 (911) 111-11-11", ABImage:[NSNull null] },
+		@{ ABFirstName:[NSNull null], ABLastName:@"Премьер-министр",       ABEmail:@"mrministr@russia.ru", ABPhone1:@"+7 (922) 222-22-22", ABImage:[NSNull null] },
+		// Мутные
+		@{ ABFirstName:@"%2%&^*", ABLastName:@"2(&@#2", ABEmail:@"hoho@mail.ru", ABPhone1:@"+7 (943) 412-23-54", ABImage:[NSNull null] },
+		@{ ABFirstName:@" $#@1 ", ABLastName:@" ^@123 ", ABEmail:@"haha@gmail.com", ABPhone1:@"+7 (935) 365-68-24", ABImage:[NSNull null] },
+		@{ ABFirstName:@"Президент", ABLastName:[NSNull null], ABEmail:@"mrprezident@russia.ru", ABPhone1:@"+7 (911) 111-11-11", ABImage:[NSNull null] },
+		@{ ABFirstName:[NSNull null], ABLastName:@"Премьер-министр", ABEmail:@"mrministr@russia.ru", ABPhone1:@"+7 (922) 222-22-22", ABImage:[NSNull null] },
 	]];
 	
 	[contacts enumerateObjectsUsingBlock:^(NSDictionary *contact, NSUInteger idx, BOOL *stop) {
 		ABRecordRef record = ABPersonCreate();
 		
-		ABRecordSetValue(record, kABPersonFirstNameProperty, contact[ABFirstName], NULL);
-		ABRecordSetValue(record, kABPersonLastNameProperty, contact[ABLastName], NULL);
+#define EXISTS(VAL) (VAL && (VAL != [NSNull null]))
 		
-		ABMutableMultiValueRef email = ABMultiValueCreateMutable(kABStringPropertyType);
-		ABMultiValueAddValueAndLabel(email, contact[ABEmail], kABHomeLabel, NULL);
-		ABRecordSetValue(record, kABPersonEmailProperty, email, NULL);
+		if (EXISTS(contact[ABFirstName]))
+			ABRecordSetValue(record, kABPersonFirstNameProperty, contact[ABFirstName], NULL);
+		if (EXISTS(contact[ABLastName]))
+			ABRecordSetValue(record, kABPersonLastNameProperty, contact[ABLastName], NULL);
 		
-		ABMutableMultiValueRef phone = ABMultiValueCreateMutable(kABStringPropertyType);
-		ABMultiValueAddValueAndLabel(phone, contact[ABPhone1], kABHomeLabel, NULL);
-		if (contact[ABPhone2])
-			ABMultiValueAddValueAndLabel(phone, contact[ABPhone2], kABWorkLabel, NULL);
-		ABRecordSetValue(record, kABPersonPhoneProperty, phone, NULL);
+		if (EXISTS(contact[ABEmail]))
+		{
+			ABMutableMultiValueRef email = ABMultiValueCreateMutable(kABStringPropertyType);
+			ABMultiValueAddValueAndLabel(email, contact[ABEmail], kABHomeLabel, NULL);
+			ABRecordSetValue(record, kABPersonEmailProperty, email, NULL);
+		}
+		
+		if (EXISTS(contact[ABPhone1]) || EXISTS(contact[ABPhone2]))
+		{
+			ABMutableMultiValueRef phone = ABMultiValueCreateMutable(kABStringPropertyType);
+			if (EXISTS(contact[ABPhone1]))
+				ABMultiValueAddValueAndLabel(phone, contact[ABPhone1], kABHomeLabel, NULL);
+			if (EXISTS(contact[ABPhone2]))
+				ABMultiValueAddValueAndLabel(phone, contact[ABPhone2], kABWorkLabel, NULL);
+			ABRecordSetValue(record, kABPersonPhoneProperty, phone, NULL);
+		}
 		
 		// Image
-		if (contact[ABImage])
+		if (EXISTS(contact[ABImage]))
 		{
 			UIImage *img = [UIImage imageNamed:contact[ABImage]];
 			NSData *dataRef = UIImagePNGRepresentation(img);
