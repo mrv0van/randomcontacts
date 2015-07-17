@@ -6,6 +6,11 @@
 
 #import "AppDelegate.h"
 
+
+#define RANDOMS_COUNT 75
+#define RANDOM_CONTACTS_TO_ADD 75
+
+
 @import AddressBook;
 
 
@@ -17,6 +22,7 @@
 - (void)dealloc
 {
 	CFRelease(addressBook);
+	[_window release];
 	[super dealloc];
 }
 
@@ -26,15 +32,15 @@
 	_window.rootViewController = [[UIViewController new] autorelease];
 	[_window makeKeyAndVisible];
 	
-	[self getAddressBook];
+	[self recreateAddressBook];
 	return YES;
 }
 
-- (void)getAddressBook
+- (void)recreateAddressBook
 {
-	printf("Accessing address book...");
+	NSLog(@"Accessing address book...");
 	addressBook = ABAddressBookCreateWithOptions(NULL, NULL);
-	if (ABAddressBookGetAuthorizationStatus != NULL)
+	if (ABAddressBookGetAuthorizationStatus)
 	{
 		switch (ABAddressBookGetAuthorizationStatus())
 		{
@@ -43,35 +49,36 @@
 				ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
 					if (granted)
 					{
-						printf(" access granted =D\n");
+						NSLog(@" access granted =D");
 						[self fillAddressBook];
 					}
 					else
 					{
-						printf(" access denied :(\n");
+						NSLog(@" access denied :(");
 					}
 				});
 				break;
 			}
 			case kABAuthorizationStatusAuthorized:
 			{
-				printf(" already have :|\n");
+				NSLog(@" already have :|");
 				[self fillAddressBook];
 				break;
 			}
 			default:
 			{
-				printf(" no access!\n");
+				NSLog(@" no access!");
 				exit(1);
 				break;
 			}
 		}
 	}
+	exit(0);
 }
 
 - (void)fillAddressBook
 {
-	printf("Cleaning address book...");
+	NSLog(@"Cleaning address book...");
 	CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addressBook);
 
 	CFIndex peopleCount = CFArrayGetCount(allPeople);
@@ -81,53 +88,73 @@
 		ABAddressBookRemoveRecord(addressBook, person, nil);
 	}
 	CFRelease(allPeople);
-	printf(" done!\n");
+	NSLog(@" done!");
 	
+	NSInteger toAdd = RANDOM_CONTACTS_TO_ADD;
+	while (toAdd > 0)
+	{
+		NSInteger willBeAdded = MIN(RANDOMS_COUNT, toAdd);
+		NSLog(@"Добавляем случайные контакты: %li шт.", willBeAdded);
+		[self fillAddressBookWithRandomCountacts:willBeAdded];
+		toAdd -= willBeAdded;
+	}
+	NSLog(@"Saving address book...");
+	ABAddressBookSave(addressBook, NULL);
+	NSLog(@" all done!");
+}
+
+- (void)fillAddressBookWithRandomCountacts:(NSInteger)contactsCountToAdd
+{
 #if 0
-	printf("Randomization contacts enabled!\n");
+	NSLog(@"Randomization contacts enabled!");
 	srand((unsigned int)time(0));
 #endif
 	
-	printf("Filling address book...\n");
+	static NSArray *Firsts = nil;
+	static NSArray *Lasts = nil;
 	
-	static const NSInteger RandomsCount = 75;
-	NSArray *Firsts = @[
-		@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
-		@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2
-		@"Ибупрофен",	@"Митрандокл",	@"Цуцхейчуг",	@"Ыкуцфыг",		@"Хъэдякцыф",	// 3
-		@"Леголас",		@"Бармалей",	@"Чупакабра",	@"Джон",		@"Фридрих",		// 4
-		@"Али",			@"Корвин",		@"Бабай",		@"Йозеф",		@"Гэндальф",	// 5
-		@"Фродо",		@"Сэммиум",		@"Перигрин",	@"Мерри",		@"Арагорн",		// 6
-		@"Боромир",		@"Фарамир",		@"Леголас",		@"Теоден",		@"Саруман",		// 7
-		@"Саурон",		@"Горлум",		@"Смеагорл",	@"Протос",		@"Люк",			// 8
-		@"Митрандир",	@"Колобок",		@"Гена",		@"Гимли",		@"Дарин",		// 9
-		@"Балин",		@"Двалин",		@"Бильбо",		@"Мерлин",		@"Максимильян",	// 10
-		@"Николай",		@"Батут",		@"Оби-Ван",		@"Йода",		@"Квай-Гон",	// 11
-		@"Энакин",		@"Хан",			@"Чубакка",		@"Мейс",		@"Боба",		// 12
-		@"Джабба",		@"Элон",		@"Брюс",		@"Арнольд",		@"Капитан",		// 13
-		@"Генерал",		@"Спанчбоб",	@"Мистер",		@"Кларк",		@"Самый",		// 14
-		@"Кот",         @"Омлет",       @"Котофей",     @"Шайтан",      @"Штирлиц",     // 15
-	];
-	BOOL firstsChosen[RandomsCount] = { 0 };
+	static dispatch_once_t OnceToken = 0;
+	dispatch_once(&OnceToken, ^{
+		Firsts = @[
+			@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
+			@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2
+			@"Ибупрофен",	@"Митрандокл",	@"Цуцхейчуг",	@"Ыкуцфыг",		@"Хъэдякцыф",	// 3
+			@"Леголас",		@"Бармалей",	@"Чупакабра",	@"Джон",		@"Фридрих",		// 4
+			@"Али",			@"Корвин",		@"Бабай",		@"Йозеф",		@"Гэндальф",	// 5
+			@"Фродо",		@"Сэммиум",		@"Перигрин",	@"Мерри",		@"Арагорн",		// 6
+			@"Боромир",		@"Фарамир",		@"Леголас",		@"Теоден",		@"Саруман",		// 7
+			@"Саурон",		@"Горлум",		@"Смеагорл",	@"Протос",		@"Люк",			// 8
+			@"Митрандир",	@"Колобок",		@"Гена",		@"Гимли",		@"Дарин",		// 9
+			@"Балин",		@"Двалин",		@"Бильбо",		@"Мерлин",		@"Максимильян",	// 10
+			@"Николай",		@"Батут",		@"Оби-Ван",		@"Йода",		@"Квай-Гон",	// 11
+			@"Энакин",		@"Хан",			@"Чубакка",		@"Мейс",		@"Боба",		// 12
+			@"Джабба",		@"Элон",		@"Брюс",		@"Арнольд",		@"Капитан",		// 13
+			@"Генерал",		@"Спанчбоб",	@"Мистер",		@"Кларк",		@"Самый",		// 14
+			@"Кот",         @"Омлет",       @"Котофей",     @"Шайтан",      @"Штирлиц",     // 15
+		];
+		[Firsts retain];
+		Lasts = @[
+			@"Обама",		@"Иванов",		@"Петров",		@"Сидоров",		@"Забугорденко",		// 1
+			@"Глупый",		@"Катапультов",	@"Ряженка",		@"Поттер",		@"Грозный",				// 2
+			@"Милый",		@"Грустный",	@"Веселый",		@"Прикольный",	@"Квазимода",			// 3
+			@"Богатый",		@"Бедный",		@"Костров",		@"Цыган",		@"Царь",				// 4
+			@"Эмберский",	@"Серый",		@"Скайуокер",	@"Вейдер",		@"Тесла",				// 5
+			@"Цукерберг",	@"Бегущий",		@"Трусливый",	@"Отважный",	@"Безнадежный",			// 6
+			@"Джобс",		@"Тьюринг",		@"Победитель",	@"Пошел-есть",	@"Больной",				// 7
+			@"Быдлокодер",	@"Скучный",		@"Зануда",		@"Двуличный",	@"Забери-меня-домой",	// 8
+			@"Криптонит",	@"Амидала",		@"Сидиус",		@"Органа",		@"Соло",				// 9
+			@"Фетт",		@"Хатт",		@"Подгорный",	@"Маск",		@"Безумный",			// 10
+			@"Коннор",		@"Вандам",		@"Ли",			@"Чан",			@"Шварценеггер",		// 11
+			@"Очевидность",	@"Чмо",			@"Тайсон",		@"Шайтан",		@"Бессмертный",			// 12
+			@"Крабс",		@"Кент",		@"Бонд",		@"Галустян",	@"Членс",				// 13
+			@"Слоупоук",	@"Криворукий",	@"Гаргантюа",	@"Континуум",	@"Сингулярность",		// 14
+			@"Экспресс",    @"Святой",      @"Первый",      @"Второй",      @"Третий",              // 15
+		];
+		[Lasts retain];
+	});
 	
-	NSArray *Lasts = @[
-		@"Обама",		@"Иванов",		@"Петров",		@"Сидоров",		@"Забугорденко",		// 1
-		@"Глупый",		@"Катапультов",	@"Ряженка",		@"Поттер",		@"Грозный",				// 2
-		@"Милый",		@"Грустный",	@"Веселый",		@"Прикольный",	@"Квазимода",			// 3
-		@"Богатый",		@"Бедный",		@"Костров",		@"Цыган",		@"Царь",				// 4
-		@"Эмберский",	@"Серый",		@"Скайуокер",	@"Вейдер",		@"Тесла",				// 5
-		@"Цукерберг",	@"Бегущий",		@"Трусливый",	@"Отважный",	@"Безнадежный",			// 6
-		@"Джобс",		@"Тьюринг",		@"Победитель",	@"Пошел-есть",	@"Больной",				// 7
-		@"Быдлокодер",	@"Скучный",		@"Зануда",		@"Двуличный",	@"Забери-меня-домой",	// 8
-		@"Криптонит",	@"Амидала",		@"Сидиус",		@"Органа",		@"Соло",				// 9
-		@"Фетт",		@"Хатт",		@"Подгорный",	@"Маск",		@"Безумный",			// 10
-		@"Коннор",		@"Вандам",		@"Ли",			@"Чан",			@"Шварценеггер",		// 11
-		@"Очевидность",	@"Чмо",			@"Тайсон",		@"Шайтан",		@"Бессмертный",			// 12
-		@"Крабс",		@"Кент",		@"Бонд",		@"Галустян",	@"Членс",				// 13
-		@"Слоупоук",	@"Криворукий",	@"Гаргантюа",	@"Континуум",	@"Сингулярность",		// 14
-		@"Экспресс",    @"Святой",      @"Первый",      @"Второй",      @"Третий",              // 15
-	];
-	BOOL lastsChosen[RandomsCount] = { 0 };
+	BOOL firstsChosen[RANDOMS_COUNT] = { 0 };
+	BOOL lastsChosen[RANDOMS_COUNT] = { 0 };
 	
 	static const NSString *ABFirstName = @"first";
 	static const NSString *ABLastName  = @"last";
@@ -137,20 +164,22 @@
 	static const NSString *ABImage     = @"image";
 	NSMutableArray *contacts = [NSMutableArray array];
 	
-	for (NSInteger i = 0; i < RandomsCount; i += 1)
+	NSLog(@"Filling address book...");
+	
+	for (NSInteger i = 0; i < RANDOMS_COUNT; i += 1)
 	{
 		NSMutableDictionary *contact = [NSMutableDictionary new];
 		contact[ABFirstName] = ({
-			NSInteger i = rand() % RandomsCount;
+			NSInteger i = rand() % RANDOMS_COUNT;
 			while (firstsChosen[i])
-				i = (i + 1) % RandomsCount;
+				i = (i + 1) % RANDOMS_COUNT;
 			firstsChosen[i] = YES;
 			Firsts[i];
 		});
 		contact[ABLastName] = ({
-			NSInteger i = rand() % RandomsCount;
+			NSInteger i = rand() % RANDOMS_COUNT;
 			while (lastsChosen[i])
-				i = (i + 1) % RandomsCount;
+				i = (i + 1) % RANDOMS_COUNT;
 			lastsChosen[i] = YES;
 			Lasts[i];
 		});
@@ -241,12 +270,8 @@
 		ABAddressBookAddRecord(addressBook, record, NULL);
 		
 		// Прогресс
-		printf("%i%% done\n", (int)((float)(idx + 1) / (float)contacts.count * 100));
+		NSLog(@"%i%% done", (int)((float)(idx + 1) / (float)contacts.count * 100));
 	}];
-	printf("Saving address book...");
-	ABAddressBookSave(addressBook, NULL);
-	printf(" all done!");
-	exit(0);
 }
 
 @end
