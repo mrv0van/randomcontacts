@@ -40,40 +40,32 @@
 {
 	NSLog(@"Accessing address book...");
 	addressBook = ABAddressBookCreateWithOptions(NULL, NULL);
-	if (ABAddressBookGetAuthorizationStatus)
+	switch (ABAddressBookGetAuthorizationStatus())
 	{
-		switch (ABAddressBookGetAuthorizationStatus())
-		{
-			case kABAuthorizationStatusNotDetermined:
+		case kABAuthorizationStatusNotDetermined:
+			ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error)
 			{
-				ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
-					if (granted)
-					{
-						NSLog(@" access granted =D");
-						[self fillAddressBook];
-					}
-					else
-					{
-						NSLog(@" access denied :(");
-					}
-				});
-				break;
-			}
-			case kABAuthorizationStatusAuthorized:
-			{
-				NSLog(@" already have :|");
-				[self fillAddressBook];
-				break;
-			}
-			default:
-			{
-				NSLog(@" no access!");
-				exit(1);
-				break;
-			}
-		}
+				if (granted)
+				{
+					NSLog(@" access granted =D");
+					[self fillAddressBook];
+					exit(0);
+				}
+				else
+				{
+					NSLog(@" access denied :(");
+					exit(1);
+				}
+			});
+			break;
+		case kABAuthorizationStatusAuthorized:
+			NSLog(@" already have :|");
+			[self fillAddressBook];
+			exit(0);
+		default:
+			NSLog(@" no access!");
+			exit(1);
 	}
-	exit(0);
 }
 
 - (void)fillAddressBook
@@ -94,7 +86,7 @@
 	while (toAdd > 0)
 	{
 		NSInteger willBeAdded = MIN(RANDOMS_COUNT, toAdd);
-		NSLog(@"Добавляем случайные контакты: %li шт.", willBeAdded);
+		NSLog(@"Добавляем случайные контакты: %i шт.", (int)willBeAdded);
 		[self fillAddressBookWithRandomCountacts:willBeAdded];
 		toAdd -= willBeAdded;
 	}
@@ -203,7 +195,7 @@
 		// Например, каждый третий без аватарки
 		if (i%3 != 0)
 		{
-			contact[ABImage] = [NSString stringWithFormat:@"%li.jpg", (i % 33)];
+			contact[ABImage] = [NSString stringWithFormat:@"%i.jpg", (int)(i % 33)];
 		}
 		
 		[(NSMutableArray *)contacts addObject:[contact autorelease]];
