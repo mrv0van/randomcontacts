@@ -164,7 +164,7 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 - (void)createRandomContacts
 {
 	CLogLn(@"\tCreating %@ random contacts", @(self.contactsCount));
-	const NSUInteger saveRequestSize = self.contactsCount / 30;
+	const NSUInteger saveRequestSize = self.contactsCount / 10;
 	const NSArray<NSString *> *givenNamesCollection = @[
 		@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
 		@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2

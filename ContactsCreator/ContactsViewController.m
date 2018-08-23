@@ -102,8 +102,6 @@ static const CGFloat ButtonSpacing = 15;
 - (void)animateHiding:(NSTimeInterval)duration
 {
 	[UIView animateWithDuration:duration
-						  delay:0
-						options:UIViewAnimationOptionCurveEaseIn
 					 animations:^{
 						 self.view.alpha = 0;
 						 self.view.transform = CGAffineTransformMakeScale(0.3, 0.3);
