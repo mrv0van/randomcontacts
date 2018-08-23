@@ -11,6 +11,6 @@
 
 @interface ContactsCreator : NSObject
 
-- (void)execute;
+- (void)executeWithCount:(NSUInteger)contactsCount;
 
 @end

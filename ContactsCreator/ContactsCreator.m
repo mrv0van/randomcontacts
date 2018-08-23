@@ -14,9 +14,7 @@
 #define NOT_SET ((id)[NSNull null])
 
 
-static const NSUInteger RandomContactCount = 1000;
 static const NSUInteger CatAvatarCount = 44;
-static const NSUInteger SaveRequestSize = 25;
 
 
 typedef NSArray<NSString *> MetaContact;
@@ -38,6 +36,7 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 @interface ContactsCreator ()
 
 @property (nonatomic, strong) CNContactStore *contactStore;
+@property (nonatomic, assign) NSUInteger contactsCount;
 
 @end
 
@@ -57,8 +56,10 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 
 #pragma mark - Actions
 
-- (void)execute
+- (void)executeWithCount:(NSUInteger)contactsCount
 {
+	self.contactsCount = contactsCount;
+	
 	CNAuthorizationStatus status = [CNContactStore authorizationStatusForEntityType:CNEntityTypeContacts];
 	switch (status)
 	{
@@ -96,11 +97,16 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 
 - (void)performChanges
 {
-	[self deleteAllContacts];
-	[self createCustomContacts];
-	[self createRandomContacts];
-	CLogLn(@"✅\tAll Done.");
-	exit(0);
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+		[self deleteAllContacts];
+		[self createCustomContacts];
+		[self createRandomContacts];
+		CLogLn(@"✅\tAll Done.");
+		
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+			exit(0);
+		});
+	});
 }
 
 - (void)deleteAllContacts
@@ -147,6 +153,7 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 		@[ @" $#@1 ",    @" ^@123 ",         @"haha@gmail.com",        NOT_SET,            @"+7 (935) 365-68-24", NOT_SET,               NOT_SET            ],
 		// Дубликаты
 		@[ @"Президент", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
+		@[ @"President", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
 		@[ NOT_SET,      @"Премьер-министр", @"mrministr@russia.ru",   NOT_SET,            @"+7 (922) 222-22-22", NOT_SET,               NOT_SET            ],
 	];
 
@@ -156,8 +163,8 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 
 - (void)createRandomContacts
 {
-	CLogLn(@"\tCreating random contacts");
-	
+	CLogLn(@"\tCreating %@ random contacts", @(self.contactsCount));
+	const NSUInteger saveRequestSize = self.contactsCount / 30;
 	const NSArray<NSString *> *givenNamesCollection = @[
 		@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
 		@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2
@@ -206,7 +213,7 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 		return phoneString;
 	};
 
-	for (NSUInteger contactIndex = 0; contactIndex < RandomContactCount; contactIndex++)
+	for (NSUInteger contactIndex = 0; contactIndex < self.contactsCount; contactIndex++)
 	{
 		NSMutableArray<NSString *> *metaContact = [NSMutableArray array];
 		
@@ -218,14 +225,6 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 		NSString *familyName = familyNamesCollection[familyNameRandomIndex];
 		[metaContact addObject:familyName];
 
-		[metaContact addObject:randomPhone(@"7900")];
-		NSString *secondPhone = NOT_SET;
-		if (rand() % 2)
-		{
-			secondPhone = randomPhone(@"7901");
-		}
-		[metaContact addObject:secondPhone];
-		
 		NSString *mainEmail = [@[
 			familyName != NOT_SET ? familyName : @"nofamily",
 			@"@",
@@ -244,7 +243,15 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 			] componentsJoinedByString:@""].lowercaseString;
 		}
 		[metaContact addObject:secondEmail];
-		
+
+		[metaContact addObject:randomPhone(@"+7900")];
+		NSString *secondPhone = NOT_SET;
+		if (rand() % 2)
+		{
+			secondPhone = randomPhone(@"+7901");
+		}
+		[metaContact addObject:secondPhone];
+
 		NSString *avatarString = NOT_SET;
 		if (rand() % 3 < 2)
 		{
@@ -254,7 +261,7 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 
 		[metaContactList addObject:[metaContact copy]];
 		
-		if (metaContactList.count == SaveRequestSize)
+		if (metaContactList.count >= saveRequestSize)
 		{
 			[self addMetaContacts:metaContactList];
 			[metaContactList removeAllObjects];
