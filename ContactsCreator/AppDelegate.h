@@ -4,12 +4,12 @@
 //  Copyright (c) 2014 SberTech. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+@import UIKit;
 
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (nonatomic, retain) UIWindow *window;
+@property (nonatomic, nullable, strong) UIWindow *window;
 
 @end
 
