@@ -7,22 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F7488A9229FEF8E00E29D8F /* Catalog.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7F7488A8229FEF8E00E29D8F /* Catalog.plist */; };
 		B290B4CA1A1A4B3E00E06DD0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B290B4C91A1A4B3E00E06DD0 /* main.m */; };
 		B290B4CD1A1A4B3E00E06DD0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B290B4CC1A1A4B3E00E06DD0 /* AppDelegate.m */; };
 		B290B4D51A1A4B3E00E06DD0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B290B4D41A1A4B3E00E06DD0 /* Images.xcassets */; };
-		B29C6F76212EA36E008ED2D8 /* ContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B29C6F75212EA36E008ED2D8 /* ContactsViewController.m */; };
+		B29C6F76212EA36E008ED2D8 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B29C6F75212EA36E008ED2D8 /* RootViewController.m */; };
 		B29C6F79212EA3A8008ED2D8 /* ContactsCreator.m in Sources */ = {isa = PBXBuildFile; fileRef = B29C6F78212EA3A8008ED2D8 /* ContactsCreator.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7F7488A8229FEF8E00E29D8F /* Catalog.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Catalog.plist; sourceTree = "<group>"; };
 		B290B4C41A1A4B3E00E06DD0 /* ContactsCreator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ContactsCreator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B290B4C81A1A4B3E00E06DD0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B290B4C91A1A4B3E00E06DD0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		B290B4CB1A1A4B3E00E06DD0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B290B4CC1A1A4B3E00E06DD0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		B290B4D41A1A4B3E00E06DD0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		B29C6F74212EA36E008ED2D8 /* ContactsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ContactsViewController.h; sourceTree = "<group>"; };
-		B29C6F75212EA36E008ED2D8 /* ContactsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ContactsViewController.m; sourceTree = "<group>"; };
+		B29C6F74212EA36E008ED2D8 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		B29C6F75212EA36E008ED2D8 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		B29C6F77212EA3A8008ED2D8 /* ContactsCreator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ContactsCreator.h; sourceTree = "<group>"; };
 		B29C6F78212EA3A8008ED2D8 /* ContactsCreator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ContactsCreator.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,10 +60,11 @@
 		B290B4C61A1A4B3E00E06DD0 /* ContactsCreator */ = {
 			isa = PBXGroup;
 			children = (
+				7F7488A8229FEF8E00E29D8F /* Catalog.plist */,
 				B29C6F77212EA3A8008ED2D8 /* ContactsCreator.h */,
 				B29C6F78212EA3A8008ED2D8 /* ContactsCreator.m */,
-				B29C6F74212EA36E008ED2D8 /* ContactsViewController.h */,
-				B29C6F75212EA36E008ED2D8 /* ContactsViewController.m */,
+				B29C6F74212EA36E008ED2D8 /* RootViewController.h */,
+				B29C6F75212EA36E008ED2D8 /* RootViewController.m */,
 				B290B4CB1A1A4B3E00E06DD0 /* AppDelegate.h */,
 				B290B4CC1A1A4B3E00E06DD0 /* AppDelegate.m */,
 				B290B4D41A1A4B3E00E06DD0 /* Images.xcassets */,
@@ -118,6 +121,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -136,6 +140,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F7488A9229FEF8E00E29D8F /* Catalog.plist in Resources */,
 				B290B4D51A1A4B3E00E06DD0 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -148,7 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B290B4CD1A1A4B3E00E06DD0 /* AppDelegate.m in Sources */,
-				B29C6F76212EA36E008ED2D8 /* ContactsViewController.m in Sources */,
+				B29C6F76212EA36E008ED2D8 /* RootViewController.m in Sources */,
 				B290B4CA1A1A4B3E00E06DD0 /* main.m in Sources */,
 				B29C6F79212EA3A8008ED2D8 /* ContactsCreator.m in Sources */,
 			);

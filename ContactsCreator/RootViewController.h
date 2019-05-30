@@ -1,5 +1,5 @@
 //
-//  ContactsViewController.h
+//  RootViewController.h
 //  ContactsCreator
 //
 //  Created by Vladimir Ozerov on 23/08/2018.
@@ -9,6 +9,6 @@
 @import UIKit;
 
 
-@interface ContactsViewController : UIViewController
+@interface RootViewController : UIViewController
 
 @end

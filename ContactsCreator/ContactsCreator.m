@@ -14,7 +14,7 @@
 #define NOT_SET ((id)[NSNull null])
 
 
-static const NSUInteger CatAvatarCount = 44;
+static const uint32_t CatAvatarCount = 44;
 
 
 typedef NSArray<NSString *> MetaContact;
@@ -38,6 +38,8 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 @property (nonatomic, strong) CNContactStore *contactStore;
 @property (nonatomic, assign) NSUInteger contactsCount;
 
+@property (nonatomic, copy) NSDictionary<NSString *, NSArray<NSString *> *> *catalog;
+
 @end
 
 
@@ -49,6 +51,9 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 	if (self)
 	{
 		_contactStore = [CNContactStore new];
+		
+		NSURL *catalogURL = [[NSBundle mainBundle] URLForResource:@"Catalog" withExtension:@"plist"];
+		_catalog = (id)[NSDictionary dictionaryWithContentsOfURL:catalogURL];
 	}
 	return self;
 }
@@ -97,7 +102,7 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 
 - (void)performChanges
 {
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
 		[self deleteAllContacts];
 		[self createCustomContacts];
 		[self createRandomContacts];
@@ -126,153 +131,6 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 		[saveRequest deleteContact:[contact mutableCopy]];
 	}
 	[self performSaveRequest:saveRequest];
-	CLog(@" done.");
-}
-
-- (void)createCustomContacts
-{
-	CLogLn(@"\tCreating custom contacts...");
-	
-	NSArray<MetaContact *> *metaContactList = @[
-		// FIRST_NAME    LAST_NAME           EMAIL_1                   EMAIL_2             PHONE_1                PHONE_2                AVATAR
-		// Разработчики
-		@[ @"Владимир",  @"Озеров",          @"ozermanious@test.com",  @"mrv0van@test.ru", @"+7 (916) 345-88-94", @"+7 (917) 844-07-30", @"Kianu"           ],
-		@[ @"Антон",     @"Серебряков",      @"serebryakov@test.com",  NOT_SET,            @"+7 (916) 378-46-87", @"+7 (904) 753-93-83", @"Crazyman.jpg"    ],
-		@[ @"Максим",    @"Рыжов",           @"rijov.maxim@test.com",  NOT_SET,            @"+7 (967) 241-83-66", @"+7 (999) 800-70-68", @"Boss.jpg"        ],
-		@[ @"Сергей",    @"Марчуков",        @"marchukov@test.com",    NOT_SET,            @"+7 (999) 800-19-91", NOT_SET,               @"Developer.jpg"   ],
-		@[ @"Алексей",   @"Леванов",         @"levanov@test.com",      NOT_SET,            @"+7 (915) 077-97-49", NOT_SET,               @"Flash.jpg"       ],
-		@[ @"Дмитрий",   @"Сакал",           @"sakalthebest@test.com", NOT_SET,            @"+7 (903) 230-94-61", NOT_SET,               @"Snowboard.jpg"   ],
-		// Сверхлюди
-		@[ @"Чак",       @"Норрис",          @"ch@ck.norris",          NOT_SET,            @"+7 (999) 999-99-99", NOT_SET,               @"ChackNorris.jpg" ],
-		@[ @"Герман",    @"Греф",            @"gref@gmail.com",        NOT_SET,            @"+7 (900) 000-00-00", NOT_SET,               @"Gref.jpg"        ],
-		// Простые
-		@[ @"Президент", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
-		@[ NOT_SET,      @"Премьер-министр", @"mrministr@russia.ru",   NOT_SET,            @"+7 (922) 222-22-22", NOT_SET,               NOT_SET            ],
-		// Мутные
-		@[ @"%2%&^*",    @"2(&@#2",          @"hoho@mail.ru",          NOT_SET,            @"+7 (943) 412-23-54", NOT_SET,               NOT_SET            ],
-		@[ @" $#@1 ",    @" ^@123 ",         @"haha@gmail.com",        NOT_SET,            @"+7 (935) 365-68-24", NOT_SET,               NOT_SET            ],
-		// Дубликаты
-		@[ @"Президент", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
-		@[ @"President", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
-		@[ NOT_SET,      @"Премьер-министр", @"mrministr@russia.ru",   NOT_SET,            @"+7 (922) 222-22-22", NOT_SET,               NOT_SET            ],
-	];
-
-	[self addMetaContacts:metaContactList];
-	CLog(@" done.");
-}
-
-- (void)createRandomContacts
-{
-	CLogLn(@"\tCreating %@ random contacts", @(self.contactsCount));
-	const NSUInteger saveRequestSize = self.contactsCount / 10;
-	const NSArray<NSString *> *givenNamesCollection = @[
-		@"Зандерлог",	@"Кирсан",		@"Алтудег",		@"Бордех",		@"Щдуырук",		// 1
-		@"Айфозавр",	@"Крабхаз",		@"Ктулху",		@"Парофен",		@"Ульрих",		// 2
-		@"Ибупрофен",	@"Митрандокл",	@"Цуцхейчуг",	@"Ыкуцфыг",		@"Хъэдякцыф",	// 3
-		@"Леголас",		@"Бармалей",	@"Чупакабра",	@"Джон",		@"Фридрих",		// 4
-		@"Али",			@"Корвин",		@"Бабай",		@"Йозеф",		@"Гэндальф",	// 5
-		@"Фродо",		@"Сэммиум",		@"Перигрин",	@"Мерри",		@"Арагорн",		// 6
-		@"Боромир",		@"Фарамир",		@"Леголас",		@"Теоден",		@"Саруман",		// 7
-		@"Саурон",		@"Горлум",		@"Смеагорл",	@"Протос",		@"Люк",			// 8
-		@"Митрандир",	@"Колобок",		@"Гена",		@"Гимли",		@"Дарин",		// 9
-		@"Балин",		@"Двалин",		@"Бильбо",		@"Мерлин",		@"Максимильян",	// 10
-		@"Николай",		@"Батут",		@"Оби-Ван",		@"Йода",		@"Квай-Гон",	// 11
-		@"Энакин",		@"Хан",			@"Чубакка",		@"Мейс",		@"Боба",		// 12
-		@"Джабба",		@"Элон",		@"Брюс",		@"Арнольд",		@"Капитан",		// 13
-		@"Генерал",		@"Спанчбоб",	@"Мистер",		@"Кларк",		@"Самый",		// 14
-		@"Кот",         @"Омлет",       @"Котофей",     @"Шайтан",      @"Штирлиц",     // 15
-		NOT_SET
-	];
-	const NSArray<NSString *> *familyNamesCollection = @[
-		@"Обама",		@"Иванов",		@"Петров",		@"Сидоров",		@"Забугорденко",		// 1
-		@"Глупый",		@"Катапультов",	@"Ряженка",		@"Поттер",		@"Грозный",				// 2
-		@"Милый",		@"Грустный",	@"Веселый",		@"Прикольный",	@"Квазимода",			// 3
-		@"Богатый",		@"Бедный",		@"Костров",		@"Цыган",		@"Царь",				// 4
-		@"Эмберский",	@"Серый",		@"Скайуокер",	@"Вейдер",		@"Тесла",				// 5
-		@"Цукерберг",	@"Бегущий",		@"Трусливый",	@"Отважный",	@"Безнадежный",			// 6
-		@"Джобс",		@"Тьюринг",		@"Победитель",	@"Пошел-есть",	@"Больной",				// 7
-		@"Быдлокодер",	@"Скучный",		@"Зануда",		@"Двуличный",	@"Забери-меня-домой",	// 8
-		@"Криптонит",	@"Амидала",		@"Сидиус",		@"Органа",		@"Соло",				// 9
-		@"Фетт",		@"Хатт",		@"Подгорный",	@"Маск",		@"Безумный",			// 10
-		@"Коннор",		@"Вандам",		@"Ли",			@"Чан",			@"Шварценеггер",		// 11
-		@"Очевидность",	@"Чмо",			@"Тайсон",		@"Шайтан",		@"Бессмертный",			// 12
-		@"Крабс",		@"Кент",		@"Бонд",		@"Галустян",	@"Членс",				// 13
-		@"Слоупоук",	@"Криворукий",	@"Гаргантюа",	@"Континуум",	@"Сингулярность",		// 14
-		@"Экспресс",    @"Святой",      @"Первый",      @"Второй",      @"Третий",              // 15
-		NOT_SET
-	];
-	
-	NSMutableArray<MetaContact *> *metaContactList = [NSMutableArray array];
-	
-	NSString * (^randomPhone)(NSString *) = ^(NSString *baseString) {
-		NSMutableString *phoneString = [baseString mutableCopy];
-		for (NSInteger charIndex = 0; charIndex < 7; charIndex += 1)
-		{
-			[phoneString appendString:@(rand() % 10).stringValue];
-		}
-		return phoneString;
-	};
-
-	for (NSUInteger contactIndex = 0; contactIndex < self.contactsCount; contactIndex++)
-	{
-		NSMutableArray<NSString *> *metaContact = [NSMutableArray array];
-		
-		NSUInteger givenNameRandomIndex = rand() % givenNamesCollection.count;
-		NSString *givenName = givenNamesCollection[givenNameRandomIndex];
-		[metaContact addObject:givenName];
-
-		NSUInteger familyNameRandomIndex = rand() % familyNamesCollection.count;
-		NSString *familyName = familyNamesCollection[familyNameRandomIndex];
-		[metaContact addObject:familyName];
-
-		NSString *mainEmail = [@[
-			familyName != NOT_SET ? familyName : @"nofamily",
-			@"@",
-			givenName != NOT_SET ? givenName : @"noname",
-			@".ru"
-		] componentsJoinedByString:@""].lowercaseString;
-		[metaContact addObject:mainEmail];
-		NSString *secondEmail = NOT_SET;
-		if (rand() % 3)
-		{
-			secondEmail = [@[
-				givenName != NOT_SET ? givenName : @"noname",
-				@".",
-				familyName != NOT_SET ? familyName : @"nofamily",
-				@"@test.ru"
-			] componentsJoinedByString:@""].lowercaseString;
-		}
-		[metaContact addObject:secondEmail];
-
-		[metaContact addObject:randomPhone(@"+7900")];
-		NSString *secondPhone = NOT_SET;
-		if (rand() % 2)
-		{
-			secondPhone = randomPhone(@"+7901");
-		}
-		[metaContact addObject:secondPhone];
-
-		NSString *avatarString = NOT_SET;
-		if (rand() % 3 < 2)
-		{
-			avatarString = @(rand() % CatAvatarCount).stringValue;
-		}
-		[metaContact addObject:avatarString];
-
-		[metaContactList addObject:[metaContact copy]];
-		
-		if (metaContactList.count >= saveRequestSize)
-		{
-			[self addMetaContacts:metaContactList];
-			[metaContactList removeAllObjects];
-			CLog(@".");
-		}
-	}
-	
-	if (metaContactList.count)
-	{
-		[self addMetaContacts:metaContactList];
-	}
 	CLog(@" done.");
 }
 
@@ -362,6 +220,189 @@ typedef NS_ENUM(NSUInteger, MetaContactIndex) {
 		CLogLn(@"🛑\tFailed.\n%@", error);
 		exit(1);
 	}
+}
+
+
+#pragma mark - Contacts generating
+
+- (void)createCustomContacts
+{
+	CLogLn(@"\tCreating custom contacts...");
+	
+	NSArray<MetaContact *> *metaContactList = @[
+		// FIRST_NAME    LAST_NAME           EMAIL_1                   EMAIL_2             PHONE_1                PHONE_2                AVATAR
+		// Разработчики
+		@[ @"Владимир",  @"Озеров",          @"ozermanious@test.com",  @"mrv0van@test.ru", @"+7 (916) 345-88-94", @"+7 (917) 844-07-30", @"Kianu"           ],
+		@[ @"Антон",     @"Серебряков",      @"serebryakov@test.com",  NOT_SET,            @"+7 (916) 378-46-87", @"+7 (904) 753-93-83", @"Crazyman.jpg"    ],
+		@[ @"Максим",    @"Рыжов",           @"rijov.maxim@test.com",  NOT_SET,            @"+7 (967) 241-83-66", @"+7 (999) 800-70-68", @"Boss.jpg"        ],
+		@[ @"Сергей",    @"Марчуков",        @"marchukov@test.com",    NOT_SET,            @"+7 (999) 800-19-91", NOT_SET,               @"Developer.jpg"   ],
+		@[ @"Алексей",   @"Леванов",         @"levanov@test.com",      NOT_SET,            @"+7 (915) 077-97-49", NOT_SET,               @"Flash.jpg"       ],
+		@[ @"Дмитрий",   @"Сакал",           @"sakalthebest@test.com", NOT_SET,            @"+7 (903) 230-94-61", NOT_SET,               @"Snowboard.jpg"   ],
+		// Сверхлюди
+		@[ @"Чак",       @"Норрис",          @"ch@ck.norris",          NOT_SET,            @"+7 (999) 999-99-99", NOT_SET,               @"ChackNorris.jpg" ],
+		@[ @"Герман",    @"Греф",            @"gref@gmail.com",        NOT_SET,            @"+7 (900) 000-00-00", NOT_SET,               @"Gref.jpg"        ],
+		// Простые
+		@[ @"Президент", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
+		@[ NOT_SET,      @"Премьер-министр", @"mrministr@russia.ru",   NOT_SET,            @"+7 (922) 222-22-22", NOT_SET,               NOT_SET            ],
+		// Мутные
+		@[ @"%2%&^*",    @"2(&@#2",          @"hoho@mail.ru",          NOT_SET,            @"+7 (943) 412-23-54", NOT_SET,               NOT_SET            ],
+		@[ @" $#@1 ",    @" ^@123 ",         @"haha@gmail.com",        NOT_SET,            @"+7 (935) 365-68-24", NOT_SET,               NOT_SET            ],
+		// Дубликаты
+		@[ @"Президент", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
+		@[ @"President", NOT_SET,            @"mrprezident@russia.ru", NOT_SET,            @"+7 (911) 111-11-11", NOT_SET,               NOT_SET            ],
+		@[ NOT_SET,      @"Премьер-министр", @"mrministr@russia.ru",   NOT_SET,            @"+7 (922) 222-22-22", NOT_SET,               NOT_SET            ],
+	];
+
+	[self addMetaContacts:metaContactList];
+	CLog(@" done.");
+}
+
+- (void)createRandomContacts
+{
+	CLogLn(@"\tCreating %@ random contacts", @(self.contactsCount));
+	const NSUInteger saveRequestSize = (NSUInteger)sqrtf((float)self.contactsCount);
+	
+	NSMutableArray<MetaContact *> *metaContactList = [NSMutableArray array];
+	for (NSUInteger contactIndex = 0; contactIndex < self.contactsCount; contactIndex++)
+	{
+		NSString *givenName      = [self randomGivenName];
+		NSString *familyName     = [self randomFamilyName];
+		NSString *mainEmail      = [self mainEmailWithGivenName:givenName familyName:familyName];
+		NSString *secondaryEmail = [self secondaryEmailWithGivenName:givenName familyName:familyName];
+		NSString *mainPhone      = [self randomMainPhoneNumber];
+		NSString *secondaryPhone = [self randomSecondaryPhoneNumber];
+		NSString *avatarString   = [self randomAvatarString];
+
+		NSArray<NSString *> *metaContact = @[
+			givenName,
+			familyName,
+			mainEmail,
+			secondaryEmail,
+			mainPhone,
+			secondaryPhone,
+			avatarString
+		];
+		[metaContactList addObject:[metaContact copy]];
+		
+		if (metaContactList.count >= saveRequestSize)
+		{
+			[self addMetaContacts:metaContactList];
+			[metaContactList removeAllObjects];
+			CLog(@".");
+		}
+	}
+	
+	if (metaContactList.count)
+	{
+		[self addMetaContacts:metaContactList];
+	}
+	CLog(@" done.");
+}
+
+- (NSString *)randomGivenName
+{
+	const NSArray<NSString *> *givenNamesCollection = self.catalog[@"Given Names"];
+	uint32_t givenNamesCount = (uint32_t)givenNamesCollection.count;
+
+	NSUInteger givenNameRandomIndex = arc4random_uniform(givenNamesCount);
+	NSString *givenName = givenNamesCollection[givenNameRandomIndex];
+	return givenName;
+}
+
+- (NSString *)randomFamilyName
+{
+	if (arc4random_uniform((uint32_t)self.contactsCount / 2) == 0)
+	{
+		return NOT_SET;
+	}
+
+	const NSArray<NSString *> *familyNamesCollection = self.catalog[@"Family Names"];
+	uint32_t familyNamesCount = (uint32_t)familyNamesCollection.count;
+
+	NSUInteger familyNameRandomIndex = arc4random_uniform(familyNamesCount);
+	NSString *familyName = familyNamesCollection[familyNameRandomIndex];
+	return familyName;
+}
+
+- (NSString *)mainEmailWithGivenName:(NSString *)givenName familyName:(NSString *)familyName
+{
+	NSString *mainEmail = [@[
+		familyName != NOT_SET ? familyName : @"nofamily",
+		@"@",
+		givenName != NOT_SET ? givenName : @"noname",
+		@".ru"
+	] componentsJoinedByString:@""].lowercaseString;
+	return mainEmail;
+}
+
+- (NSString *)secondaryEmailWithGivenName:(NSString *)givenName familyName:(NSString *)familyName
+{
+	if (arc4random_uniform(2))
+	{
+		return NOT_SET;
+	}
+	NSString *secondEmail = [@[
+		givenName != NOT_SET ? givenName : @"noname",
+		@".",
+		familyName != NOT_SET ? familyName : @"nofamily",
+		@"@test.ru"
+	] componentsJoinedByString:@""].lowercaseString;
+	return secondEmail;
+}
+
+- (NSString *)randomMainPhoneNumber
+{
+	return [self randomPhoneNumberWithPrefix:@"+7900"];
+}
+
+- (NSString *)randomSecondaryPhoneNumber
+{
+	if (arc4random_uniform(2))
+	{
+		return NOT_SET;
+	}
+	return [self randomPhoneNumberWithPrefix:@"+7911"];
+}
+
+- (NSString *)randomPhoneNumberWithPrefix:(NSString *)phoneNumberPrefix
+{
+	static NSString *phoneNumberToRepeat = nil;
+	static uint32_t updateFactor = 0;
+	static uint32_t repeatFactor = 0;
+	
+	if (phoneNumberToRepeat && !arc4random_uniform(repeatFactor))
+	{
+		return phoneNumberToRepeat;
+	}
+	
+	NSMutableString *mutableString = [phoneNumberPrefix mutableCopy];
+	for (NSInteger charIndex = 0; charIndex < 7; charIndex += 1)
+	{
+		[mutableString appendString:@(arc4random_uniform(10)).stringValue];
+	}
+	NSString *phoneNumber = [mutableString copy];
+	
+	if (!phoneNumberToRepeat)
+	{
+		updateFactor = sqrtf(self.contactsCount);
+		repeatFactor = updateFactor;
+	}
+	if (!phoneNumberToRepeat || !arc4random_uniform(updateFactor))
+	{
+		phoneNumberToRepeat = phoneNumber;
+	}
+
+	return phoneNumber;
+}
+
+- (NSString *)randomAvatarString
+{
+	if (arc4random_uniform(3) > 0)
+	{
+		return NOT_SET;
+	}
+	NSString *avatarString = @(arc4random_uniform(CatAvatarCount)).stringValue;
+	return avatarString;
 }
 
 @end
